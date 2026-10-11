@@ -20,7 +20,7 @@
         <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
             <div>
                 <h1 class="text-xl font-bold tracking-wide text-amber-400">Aroma Bistro & Bar</h1>
-                <p class="text-xs text-gray-400">Дигитално мени</p>
+                <p class="text-xs text-gray-400" id="header-subtitle">Дигитално мени</p>
             </div>
             <!-- Dugmići za jezik -->
             <div class="flex gap-1 text-xs font-semibold">
@@ -98,22 +98,42 @@
     
     <form id="gform" action="https://docs.google.com/forms/d/e/1FAIpQLSeLlIjcNZ_uoxTLpB6oOiFDEJfF7KOBYVrQF8Iqd80pSo0XRw/formResponse" method="POST" target="hidden_iframe" class="hidden">
         <input type="text" name="entry.1058901983" id="input_vreme">
+        <input type="text" name="entry.1928541526" id="input_masa">
         <input type="text" name="entry.270385887" id="input_naracki">
-        <input type="text" name="entry.1928541526" id="input_vkupno">
+        <input type="text" name="entry.1234567890" id="input_vkupno">
     </form>
 
     <script>
-        // Meni Podaci
+        // Bogat Meni Sa Više Izbora
         const menuData = [
+            // Pizze
             { id: 1, cat: 'pizzas', name: { mk: 'Маргарита', en: 'Margherita', sq: 'Margherita' }, price: 320, img: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=300' },
             { id: 2, cat: 'pizzas', name: { mk: 'Капричоза', en: 'Capricciosa', sq: 'Capricciosa' }, price: 380, img: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=300' },
-            { id: 3, cat: 'drinks', name: { mk: 'Кока Кола 0.33l', en: 'Coca Cola 0.33l', sq: 'Coca Cola 0.33l' }, price: 110, img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300' },
-            { id: 4, cat: 'drinks', name: { mk: 'Еспресо', en: 'Espresso', sq: 'Espresso' }, price: 80, img: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=300' }
+            { id: 3, cat: 'pizzas', name: { mk: 'Пеперони', en: 'Pepperoni', sq: 'Pepperoni' }, price: 410, img: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=300' },
+            { id: 4, cat: 'pizzas', name: { mk: 'Кватро Формаџи', en: 'Quattro Formaggi', sq: 'Quattro Formaggi' }, price: 440, img: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300' },
+            { id: 5, cat: 'pizzas', name: { mk: 'Арома Специјал', en: 'Aroma Special', sq: 'Aroma Special' }, price: 490, img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=300' },
+
+            // Pasta i Sendviči
+            { id: 6, cat: 'food', name: { mk: 'Карбонара', en: 'Carbonara', sq: 'Carbonara' }, price: 340, img: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?w=300' },
+            { id: 7, cat: 'food', name: { mk: 'Болоњезе', en: 'Bolognese', sq: 'Bolognese' }, price: 320, img: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=300' },
+            { id: 8, cat: 'food', name: { mk: 'Пилешки Панини', en: 'Chicken Panini', sq: 'Panini me Pulë' }, price: 260, img: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=300' },
+
+            // Pića
+            { id: 9, cat: 'drinks', name: { mk: 'Еспресо', en: 'Espresso', sq: 'Espresso' }, price: 80, img: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=300' },
+            { id: 10, cat: 'drinks', name: { mk: 'Макијато', en: 'Macchiato', sq: 'Macchiato' }, price: 90, img: 'https://images.unsplash.com/photo-1534778101976-62847782c213?w=300' },
+            { id: 11, cat: 'drinks', name: { mk: 'Кока Кола 0.33l', en: 'Coca Cola 0.33l', sq: 'Coca Cola 0.33l' }, price: 110, img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300' },
+            { id: 12, cat: 'drinks', name: { mk: 'Цеден Портокал', en: 'Fresh Orange Juice', sq: 'Lëng Portokalli' }, price: 160, img: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?w=300' },
+            { id: 13, cat: 'drinks', name: { mk: 'Скопско Пиво 0.5l', en: 'Skopsko Beer 0.5l', sq: 'Birrë Skopsko 0.5l' }, price: 140, img: 'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=300' },
+
+            // Deserti
+            { id: 14, cat: 'desserts', name: { mk: 'Тирамису', en: 'Tiramisu', sq: 'Tiramisu' }, price: 220, img: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=300' },
+            { id: 15, cat: 'desserts', name: { mk: 'Чоколаден Суфле', en: 'Chocolate Souffle', sq: 'Sufle me Çokollatë' }, price: 240, img: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=300' }
         ];
 
         const translations = {
             mk: {
-                categories: { pizzas: 'Пици', drinks: 'Пијалоци' },
+                subtitle: 'Дигитално мени',
+                categories: { pizzas: 'Пици', food: 'Паста & Храна', drinks: 'Пијалоци', desserts: 'Десерти' },
                 narackiLabel: 'Нарачки:',
                 viewOrder: 'Преглед на нарачка',
                 modalTitle: 'Вашата нарачка',
@@ -124,7 +144,8 @@
                 emptyCart: 'Вашата кошничка е празна!'
             },
             en: {
-                categories: { pizzas: 'Pizzas', drinks: 'Drinks' },
+                subtitle: 'Digital Menu',
+                categories: { pizzas: 'Pizzas', food: 'Pasta & Food', drinks: 'Drinks', desserts: 'Desserts' },
                 narackiLabel: 'Orders:',
                 viewOrder: 'View Order',
                 modalTitle: 'Your Order',
@@ -135,7 +156,8 @@
                 emptyCart: 'Your cart is empty!'
             },
             sq: {
-                categories: { pizzas: 'Picat', drinks: 'Pijet' },
+                subtitle: 'Menu Digjitale',
+                categories: { pizzas: 'Picat', food: 'Pasta & Ushqim', drinks: 'Pijet', desserts: 'Ëmbëlsira' },
                 narackiLabel: 'Porositë:',
                 viewOrder: 'Shiko porosinë',
                 modalTitle: 'Porosia juaj',
@@ -151,9 +173,15 @@
         let activeCategory = 'pizzas';
         let cart = [];
         let submitted = false;
+        let currentTable = 'Sto 1';
 
-        // Automatska detekcija jezika
         function initLanguage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tableParam = urlParams.get('sto') || urlParams.get('table') || urlParams.get('masa');
+            if (tableParam) {
+                currentTable = 'Sto ' + tableParam;
+            }
+
             const userLang = navigator.language || navigator.userLanguage;
             if (userLang.startsWith('sq')) currentLang = 'sq';
             else if (userLang.startsWith('en')) currentLang = 'en';
@@ -173,6 +201,7 @@
             });
 
             const t = translations[currentLang];
+            document.getElementById('header-subtitle').innerText = t.subtitle + ' (' + currentTable + ')';
             document.getElementById('txt-naracki-label').innerText = t.narackiLabel;
             document.getElementById('btn-view-order').innerText = t.viewOrder;
             document.getElementById('modal-title').innerText = t.modalTitle;
@@ -186,7 +215,7 @@
 
         function renderCategories() {
             const container = document.getElementById('categories-container');
-            const cats = ['pizzas', 'drinks'];
+            const cats = ['pizzas', 'food', 'drinks', 'desserts'];
             const t = translations[currentLang];
 
             container.innerHTML = cats.map(cat => `
@@ -264,7 +293,6 @@
             document.getElementById('cart-total').innerText = `${totalSum} ден.`;
             document.getElementById('modal-total-sum').innerText = `${totalSum} ден.`;
 
-            // Modal lista
             const modalList = document.getElementById('cart-list');
             modalList.innerHTML = cart.map(i => `
                 <div class="flex justify-between items-center text-sm border-b pb-2">
@@ -288,15 +316,14 @@
             btn.disabled = true;
             document.getElementById('btn-confirm-text').innerText = t.sending;
 
-            // Vreme HH:MM
             const now = new Date();
             const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
 
             const narackiString = cart.map(i => `${i.name['mk']} x${i.qty}`).join(", ");
             const totalSum = cart.reduce((acc, curr) => acc + (curr.price * curr.qty), 0) + " ден.";
 
-            // Popunjavanje skrivenih inputa
             document.getElementById('input_vreme').value = currentTime;
+            document.getElementById('input_masa').value = currentTable;
             document.getElementById('input_naracki').value = narackiString;
             document.getElementById('input_vkupno').value = totalSum;
 
