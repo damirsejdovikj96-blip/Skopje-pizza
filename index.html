@@ -14,9 +14,6 @@
   <!-- Header -->
   <header class="bg-gradient-to-r from-amber-900 via-amber-800 to-amber-950 text-white p-5 text-center shadow-lg sticky top-0 z-20">
     <h1 class="text-2xl font-black tracking-wider uppercase">🍕 Aroma Bistro & Bar</h1>
-    <div id="table-badge" class="mt-2 inline-block bg-amber-600/80 backdrop-blur text-amber-50 text-xs px-4 py-1.5 rounded-full font-bold shadow-inner">
-      Маса: Се вчитава...
-    </div>
   </header>
 
   <!-- MENI -->
@@ -191,25 +188,36 @@
 
   </main>
 
-  <!-- Donja fiksna traka -->
-  <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 p-4 shadow-2xl z-30 max-w-md mx-auto rounded-t-3xl">
-    <div class="flex justify-between items-center">
-      <div>
-        <p id="total-items-badge" class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">ВКУПНО (0 АРТИКАЛИ)</p>
-        <p id="bottom-total" class="text-2xl font-black text-amber-600">0 МКД</p>
+  <!-- Donja fiksna traka sa zelenim dugmetom NA RAČAJ i malim dugmetom KORPA -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 p-3 shadow-2xl z-30 max-w-md mx-auto rounded-t-3xl">
+    <div class="flex items-center justify-between gap-2">
+      <!-- Ukupna cena i broj artikala -->
+      <div class="pl-2">
+        <p id="total-items-badge" class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">0 АРТИКАЛИ</p>
+        <p id="bottom-total" class="text-xl font-black text-amber-600">0 МКД</p>
       </div>
-      <button onclick="openCartModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3.5 rounded-2xl font-black shadow-lg active:scale-95 transition flex items-center gap-2 text-base">
-        🛒 Кошничка
-      </button>
+
+      <div class="flex items-center gap-2">
+        <!-- Malo dugme sa ikonicom kolica za otvaranje korpe -->
+        <button onclick="openCartModal()" class="relative bg-gray-100 hover:bg-gray-200 text-gray-800 p-3 rounded-2xl font-black shadow active:scale-95 transition flex items-center justify-center">
+          🛒
+          <span id="cart-badge-count" class="absolute -top-1 -right-1 bg-amber-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
+        </button>
+
+        <!-- ZELENO DUGME ZA NA RAČANJE DIREKTNO -->
+        <button onclick="sendOrderDirectly()" class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-5 py-3.5 rounded-2xl font-black shadow-lg shadow-emerald-600/30 active:scale-95 transition text-base tracking-wide flex items-center gap-1.5">
+          🚀 ПОТВРДИ И НАРАЧАЈ
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Modal za korpu -->
+  <!-- Modal za korpu (za izmenu i brisanje artikala) -->
   <div id="cart-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 space-y-4 max-h-[85vh] flex flex-col justify-between shadow-2xl">
       <div>
         <div class="flex justify-between items-center border-b border-gray-100 pb-3">
-          <h3 class="text-xl font-black text-gray-900 flex items-center gap-2">🛒 Вашата Нарачка</h3>
+          <h3 class="text-xl font-black text-gray-900 flex items-center gap-2">🛒 Вашата Кошничка</h3>
           <div class="flex items-center gap-2">
             <button onclick="clearCart()" class="text-xs text-rose-600 hover:text-rose-700 font-bold bg-rose-50 px-2.5 py-1 rounded-lg">🗑️ Исчисти сè</button>
             <button onclick="closeCartModal()" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-500 font-bold flex items-center justify-center text-lg transition">&times;</button>
@@ -227,7 +235,6 @@
           <span id="modal-total" class="text-2xl font-black text-amber-600">0 МКД</span>
         </div>
 
-        <!-- ZELENO DUGME ZA SLANJE NARUDŽBINE -->
         <button onclick="sendOrderDirectly()" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-black py-4 rounded-2xl shadow-xl shadow-emerald-600/30 active:scale-95 transition text-center text-lg tracking-wide">
           🚀 ПОТВРДИ И НАРАЧАЈ
         </button>
@@ -240,11 +247,11 @@
 
   <!-- JS Logika -->
   <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxsoa8rmYQL_zpTQUVH8SGMBKJBtnDHBjZWz2R8VMyJPJ9aTAMOBYId464CGi9g9fG/exec";
+    // Novi URL sa slike (Version 4)
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzBRdclebBTsNjVIYXAi7xf06PDtZihL8t6gu3uy0opP_C6XXKLQkuh5p8cPZn76MZG/exec";
 
     const urlParams = new URLSearchParams(window.location.search);
     const tableNumber = urlParams.get('sto') || 'Непознато';
-    document.getElementById('table-badge').innerText = "Маса број: " + tableNumber;
 
     let cart = [];
 
@@ -277,7 +284,15 @@
 
       document.getElementById('bottom-total').innerText = total + " МКД";
       document.getElementById('modal-total').innerText = total + " МКД";
-      document.getElementById('total-items-badge').innerText = `ВКУПНО (${totalCount} АРТИКАЛИ)`;
+      document.getElementById('total-items-badge').innerText = `${totalCount} АРТИКАЛИ`;
+
+      const badgeCount = document.getElementById('cart-badge-count');
+      if (totalCount > 0) {
+        badgeCount.innerText = totalCount;
+        badgeCount.classList.remove('hidden');
+      } else {
+        badgeCount.classList.add('hidden');
+      }
 
       const listContainer = document.getElementById('cart-items-list');
       if (cart.length === 0) {
