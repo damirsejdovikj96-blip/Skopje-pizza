@@ -6,7 +6,7 @@
     <title>Aroma Bistro & Bar - Meni</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-100 pb-24">
@@ -16,10 +16,10 @@
         <div class="max-w-md mx-auto flex justify-between items-center">
             <div>
                 <h1 class="text-xl font-bold tracking-wide text-amber-500">Aroma Bistro & Bar</h1>
-                <p id="table-display" class="text-xs text-gray-300">Маса: Се вчитува...</p>
+                <p id="table-display" class="text-xs text-gray-300">Маса: 1</p>
             </div>
             <button onclick="toggleCart()" class="relative bg-amber-500 text-slate-900 font-bold px-3 py-2 rounded-lg flex items-center gap-2">
-                <i class="fa-solid font-bold fa-cart-shopping"></i>
+                <i class="fa-solid fa-cart-shopping"></i>
                 <span id="cart-count" class="bg-slate-900 text-white text-xs px-2 py-0.5 rounded-full">0</span>
             </button>
         </div>
@@ -37,7 +37,7 @@
 
         <!-- Menu Items Grid -->
         <div id="menu-container" class="grid grid-cols-1 gap-4">
-            <!-- Items will be generated here -->
+            <!-- Items generated here -->
         </div>
     </main>
 
@@ -59,14 +59,14 @@
                     <span id="cart-total">0 ден.</span>
                 </div>
                 <button id="send-order-btn" onclick="submitOrder()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-paper-plane"></i> 🚀 ПОТВРДИ И НАРАЧАЈ
+                    <i class="fa-solid fa-paper-plane"></i> ПОТВРДИ И НАРАЧАЈ
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        // Data Configuration
+        // Target Google Form
         const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeLlIjcNZ_uoxTLpB6oOiFDEJfF7KOBYVrQF8Iqd80pSo0XRw/formResponse";
         const ENTRY_MASA = "entry.1058901983";
         const ENTRY_NARACKI = "entry.1928541526";
@@ -78,14 +78,13 @@
             { id: 3, name: "Кока Кола 0.25", price: 110, cat: "pijaoci" },
             { id: 4, name: "Цеден Портокал", price: 140, cat: "pijaoci" },
             { id: 5, name: "Пица Капричоза", price: 320, cat: "hrana" },
-            { id: 6, name: "Арома Бургер", price: 280, cat: "hrana" },
+            { id: 6, name: "Аロマ Бургер", price: 280, cat: "hrana" },
             { id: 7, name: "Палачинка со Nutella", price: 160, cat: "deserti" }
         ];
 
         let cart = [];
         let currentTable = "1";
 
-        // Get table number from URL query string
         function getTableNumber() {
             const params = new URLSearchParams(window.location.search);
             const sto = params.get('sto') || params.get('table') || params.get('masa');
@@ -93,7 +92,6 @@
             document.getElementById('table-display').innerText = "Маса: " + currentTable;
         }
 
-        // Render Menu Items
         function renderMenu(category = 'all') {
             const container = document.getElementById('menu-container');
             container.innerHTML = '';
@@ -121,7 +119,6 @@
             renderMenu(cat);
         }
 
-        // Cart Actions
         function addToCart(id) {
             const item = menuItems.find(i => i.id === id);
             const inCart = cart.find(i => i.id === id);
@@ -159,9 +156,9 @@
                             <p class="text-xs text-gray-500">${item.price} ден. x ${item.qty}</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button onclick="changeQty(${item.id}, -1)" class="bg-gray-200 px-2 py-0.5 rounded font-bold text-sm">-</button>
-                            <span class="font-semibold text-sm">${item.qty}</span>
-                            <button onclick="changeQty(${item.id}, 1)" class="bg-gray-200 px-2 py-0.5 rounded font-bold text-sm">+</button>
+                            <button onclick="changeQty(${item.id}, -1)" class="bg-gray-200 px-2.5 py-1 rounded font-bold text-sm">-</button>
+                            <span class="font-semibold text-sm px-1">${item.qty}</span>
+                            <button onclick="changeQty(${item.id}, 1)" class="bg-gray-200 px-2.5 py-1 rounded font-bold text-sm">+</button>
                         </div>
                     </div>
                 `;
@@ -184,7 +181,6 @@
             modal.classList.toggle('hidden');
         }
 
-        // Submit Order to Google Form
         function submitOrder() {
             if (cart.length === 0) return alert("Кошничката е празна!");
 
@@ -195,31 +191,34 @@
             const narackiString = cart.map(i => `${i.name} x${i.qty}`).join(", ");
             const totalSum = cart.reduce((acc, curr) => acc + (curr.price * curr.qty), 0) + " ден.";
 
-            const formData = new FormData();
-            formData.append(ENTRY_MASA, currentTable);
-            formData.append(ENTRY_NARACKI, narackiString);
-            formData.append(ENTRY_VKUPNO, totalSum);
+            // Format body as x-www-form-urlencoded for Google Forms compatibility
+            const bodyData = new URLSearchParams();
+            bodyData.append(ENTRY_MASA, currentTable);
+            bodyData.append(ENTRY_NARACKI, narackiString);
+            bodyData.append(ENTRY_VKUPNO, totalSum);
 
             fetch(GOOGLE_FORM_URL, {
                 method: "POST",
-                body: formData,
-                mode: "no-cors"
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: bodyData.toString()
             }).then(() => {
                 alert("Нарачката е успешно испратена!");
                 cart = [];
                 updateCartUI();
                 toggleCart();
                 btn.disabled = false;
-                btn.innerText = "🚀 ПОТВРДИ И НАРАЧАЈ";
+                btn.innerText = "ПОТВРДИ И НАРАЧАЈ";
             }).catch(error => {
-                alert("Грешка при испраќање. Обидете се повторно.");
+                alert("Грешка при испраќање.");
                 console.error(error);
                 btn.disabled = false;
-                btn.innerText = "🚀 ПОТВРДИ И НАРАЧАЈ";
+                btn.innerText = "ПОТВРДИ И НАРАЧАЈ";
             });
         }
 
-        // Init
         getTableNumber();
         renderMenu();
     </script>
