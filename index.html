@@ -27,10 +27,21 @@
                 <h1 class="text-xl font-bold tracking-wide text-amber-500">Aroma Bistro & Bar</h1>
                 <p id="table-display" class="text-xs text-gray-300">Маса: 1</p>
             </div>
-            <button onclick="toggleCart()" class="relative bg-amber-500 text-slate-900 font-bold px-3 py-2 rounded-lg flex items-center gap-2">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span id="cart-count-header" class="bg-slate-900 text-white text-xs px-2 py-0.5 rounded-full">0</span>
-            </button>
+            
+            <div class="flex items-center gap-2">
+                <!-- Language Selector -->
+                <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-slate-800 text-amber-500 text-xs font-bold py-1.5 px-2 rounded-lg border border-amber-500/30 outline-none">
+                    <option value="mk">🇲🇰 MK</option>
+                    <option value="en">🇬🇧 EN</option>
+                    <option value="sq">🇦🇱 SQ</option>
+                </select>
+
+                <!-- Cart Header Button -->
+                <button onclick="toggleCart()" class="relative bg-amber-500 text-slate-900 font-bold px-3 py-1.5 rounded-lg flex items-center gap-2">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span id="cart-count-header" class="bg-slate-900 text-white text-xs px-2 py-0.5 rounded-full">0</span>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -38,10 +49,10 @@
     <main class="max-w-md mx-auto p-4">
         <!-- Categories -->
         <div class="flex gap-2 overflow-x-auto pb-4 mb-2 no-scrollbar">
-            <button onclick="filterCategory('all')" class="bg-amber-500 text-slate-900 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap">Сите</button>
-            <button onclick="filterCategory('pijaoci')" class="bg-white text-gray-700 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap border">Пијалоци</button>
-            <button onclick="filterCategory('hrana')" class="bg-white text-gray-700 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap border">Храна</button>
-            <button onclick="filterCategory('deserti')" class="bg-white text-gray-700 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap border">Десерти</button>
+            <button id="cat-all" onclick="filterCategory('all')" class="bg-amber-500 text-slate-900 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap">Сите</button>
+            <button id="cat-pijaoci" onclick="filterCategory('pijaoci')" class="bg-white text-gray-700 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap border">Пијалоци</button>
+            <button id="cat-hrana" onclick="filterCategory('hrana')" class="bg-white text-gray-700 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap border">Храна</button>
+            <button id="cat-deserti" onclick="filterCategory('deserti')" class="bg-white text-gray-700 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap border">Десерти</button>
         </div>
 
         <!-- Menu Items Grid -->
@@ -50,10 +61,10 @@
         </div>
     </main>
 
-    <!-- Floating Green "НАРАЧАЈ" Button (Bottom Right) -->
+    <!-- Floating Green Button (Bottom Right) -->
     <button onclick="toggleCart()" class="fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-5 rounded-full shadow-2xl flex items-center gap-3 z-40 border-2 border-white active:scale-95 transition">
         <i class="fa-solid fa-cart-shopping text-lg"></i>
-        <span>НАРАЧАЈ</span>
+        <span id="floating-btn-text">НАРАЧАЈ</span>
         <span id="floating-cart-badge" class="bg-white text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
     </button>
 
@@ -61,7 +72,7 @@
     <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex justify-end flex-col">
         <div class="bg-white rounded-t-2xl p-4 max-w-md w-full mx-auto max-h-[80vh] flex flex-col shadow-2xl">
             <div class="flex justify-between items-center border-b pb-3">
-                <h2 class="text-lg font-bold text-slate-900">Вашата нарачка</h2>
+                <h2 id="modal-title" class="text-lg font-bold text-slate-900">Вашата нарачка</h2>
                 <button onclick="toggleCart()" class="text-gray-500 text-xl font-bold">&times;</button>
             </div>
             
@@ -71,11 +82,11 @@
 
             <div class="border-t pt-3">
                 <div class="flex justify-between font-bold text-lg mb-4 text-slate-900">
-                    <span>Вкупно:</span>
+                    <span id="label-total">Вкупно:</span>
                     <span id="cart-total">0 ден.</span>
                 </div>
                 <button id="send-order-btn" onclick="submitOrder()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-paper-plane"></i> ПОТВРДИ И НАРАЧАЈ
+                    <i class="fa-solid fa-paper-plane"></i> <span id="btn-confirm-text">ПОТВРДИ И НАРАЧАЈ</span>
                 </button>
             </div>
         </div>
@@ -83,29 +94,160 @@
 
     <script>
         let submitted = false;
+        let currentLang = 'mk';
 
-        // Lista artikala sa opcijom za sliku (img)
+        // Translations Dictionary
+        const translations = {
+            mk: {
+                tablePrefix: "Маса: ",
+                catAll: "Сите",
+                catPijaoci: "Пијалоци",
+                catHrana: "Храна",
+                catDeserti: "Десерти",
+                orderBtn: "НАРАЧАЈ",
+                modalTitle: "Вашата нарачка",
+                total: "Вкупно:",
+                confirmBtn: "ПОТВРДИ И НАРАЧАЈ",
+                sending: "Се испраќа...",
+                emptyCart: "Кошничката е празна",
+                successMsg: "Нарачката е успешно испратена!",
+                currency: "ден."
+            },
+            en: {
+                tablePrefix: "Table: ",
+                catAll: "All",
+                catPijaoci: "Drinks",
+                catHrana: "Food",
+                catDeserti: "Desserts",
+                orderBtn: "ORDER",
+                modalTitle: "Your Order",
+                total: "Total:",
+                confirmBtn: "CONFIRM & ORDER",
+                sending: "Sending...",
+                emptyCart: "Your cart is empty",
+                successMsg: "Your order was sent successfully!",
+                currency: "den."
+            },
+            sq: {
+                tablePrefix: "Tryeza: ",
+                catAll: "Të gjitha",
+                catPijaoci: "Pije",
+                catHrana: "Ushqim",
+                catDeserti: "Ëmbëlsira",
+                orderBtn: "POROSIT",
+                modalTitle: "Porosia juaj",
+                total: "Së bashku:",
+                confirmBtn: "KONFIRMO & POROSIT",
+                sending: "Po dërgohet...",
+                emptyCart: "Shporta është bosh",
+                successMsg: "Porosia juaj u dërgua me sukses!",
+                currency: "den."
+            }
+        };
+
+        // Multilingual Items
         const menuItems = [
-            { id: 1, name: "Еспресо", price: 80, cat: "pijaoci", img: "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=150&auto=format&fit=crop&q=60" },
-            { id: 2, name: "Капучино", price: 100, cat: "pijaoci", img: "https://images.unsplash.com/photo-1534778101976-62847782c213?w=150&auto=format&fit=crop&q=60" },
-            { id: 3, name: "Кока Кола 0.25", price: 110, cat: "pijaoci", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=150&auto=format&fit=crop&q=60" },
-            { id: 4, name: "Цеден Портокал", price: 140, cat: "pijaoci", img: "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=150&auto=format&fit=crop&q=60" },
-            { id: 5, name: "Пица Капричоза", price: 320, cat: "hrana", img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=150&auto=format&fit=crop&q=60" },
-            { id: 6, name: "Арома Бургер", price: 280, cat: "hrana", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=150&auto=format&fit=crop&q=60" },
-            { id: 7, name: "Палачинка со Nutella", price: 160, cat: "deserti", img: "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=150&auto=format&fit=crop&q=60" }
+            { 
+                id: 1, 
+                name: { mk: "Еспресо", en: "Espresso", sq: "Espreso" }, 
+                price: 80, 
+                cat: "pijaoci", 
+                img: "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=150&auto=format&fit=crop&q=60" 
+            },
+            { 
+                id: 2, 
+                name: { mk: "Капучино", en: "Cappuccino", sq: "Kapuçino" }, 
+                price: 100, 
+                cat: "pijaoci", 
+                img: "https://images.unsplash.com/photo-1534778101976-62847782c213?w=150&auto=format&fit=crop&q=60" 
+            },
+            { 
+                id: 3, 
+                name: { mk: "Кока Кола 0.25", en: "Coca Cola 0.25", sq: "Koka Kola 0.25" }, 
+                price: 110, 
+                cat: "pijaoci", 
+                img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=150&auto=format&fit=crop&q=60" 
+            },
+            { 
+                id: 4, 
+                name: { mk: "Цеден Портокал", en: "Fresh Orange Juice", sq: "Lëng Portokalli" }, 
+                price: 140, 
+                cat: "pijaoci", 
+                img: "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=150&auto=format&fit=crop&q=60" 
+            },
+            { 
+                id: 5, 
+                name: { mk: "Пица Капричоза", en: "Pizza Capricciosa", sq: "Pica Kapriçoza" }, 
+                price: 320, 
+                cat: "hrana", 
+                img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=150&auto=format&fit=crop&q=60" 
+            },
+            { 
+                id: 6, 
+                name: { mk: "Арома Бургер", en: "Aroma Burger", sq: "Aroma Burger" }, 
+                price: 280, 
+                cat: "hrana", 
+                img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=150&auto=format&fit=crop&q=60" 
+            },
+            { 
+                id: 7, 
+                name: { mk: "Палачинка со Nutella", en: "Nutella Pancake", sq: "Pallaçinkë me Nutella" }, 
+                price: 160, 
+                cat: "deserti", 
+                img: "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=150&auto=format&fit=crop&q=60" 
+            }
         ];
 
         let cart = [];
         let currentTable = "1";
+        let activeCategory = 'all';
+
+        // Detect Language Automatically
+        function detectLanguage() {
+            const userLang = (navigator.language || navigator.userLanguage || 'mk').toLowerCase();
+            if (userLang.startsWith('sq')) {
+                currentLang = 'sq';
+            } else if (userLang.startsWith('en')) {
+                currentLang = 'en';
+            } else {
+                currentLang = 'mk';
+            }
+            document.getElementById('lang-select').value = currentLang;
+            applyLanguage();
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const t = translations[currentLang];
+            
+            document.getElementById('cat-all').innerText = t.catAll;
+            document.getElementById('cat-pijaoci').innerText = t.catPijaoci;
+            document.getElementById('cat-hrana').innerText = t.catHrana;
+            document.getElementById('cat-deserti').innerText = t.catDeserti;
+
+            document.getElementById('floating-btn-text').innerText = t.orderBtn;
+            document.getElementById('modal-title').innerText = t.modalTitle;
+            document.getElementById('label-total').innerText = t.total;
+            document.getElementById('btn-confirm-text').innerText = t.confirmBtn;
+
+            getTableNumber();
+            renderMenu(activeCategory);
+            updateCartUI();
+        }
 
         function getTableNumber() {
             const params = new URLSearchParams(window.location.search);
             const sto = params.get('sto') || params.get('table') || params.get('masa');
             if (sto) currentTable = sto;
-            document.getElementById('table-display').innerText = "Маса: " + currentTable;
+            document.getElementById('table-display').innerText = translations[currentLang].tablePrefix + currentTable;
         }
 
         function renderMenu(category = 'all') {
+            activeCategory = category;
             const container = document.getElementById('menu-container');
             container.innerHTML = '';
 
@@ -114,13 +256,14 @@
                 : menuItems.filter(item => item.cat === category);
 
             filtered.forEach(item => {
+                const itemName = item.name[currentLang] || item.name['mk'];
                 container.innerHTML += `
                     <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between gap-3">
                         <div class="flex items-center gap-3">
-                            <img src="${item.img}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg bg-gray-100 flex-shrink-0">
+                            <img src="${item.img}" alt="${itemName}" class="w-16 h-16 object-cover rounded-lg bg-gray-100 flex-shrink-0">
                             <div>
-                                <h3 class="font-bold text-slate-800 text-sm">${item.name}</h3>
-                                <p class="text-amber-600 font-semibold text-xs mt-0.5">${item.price} ден.</p>
+                                <h3 class="font-bold text-slate-800 text-sm">${itemName}</h3>
+                                <p class="text-amber-600 font-semibold text-xs mt-0.5">${item.price} ${translations[currentLang].currency}</p>
                             </div>
                         </div>
                         <button onclick="addToCart(${item.id})" class="bg-slate-900 hover:bg-slate-800 text-white w-9 h-9 rounded-lg font-bold flex items-center justify-center active:scale-95 transition flex-shrink-0">
@@ -148,27 +291,29 @@
         }
 
         function updateCartUI() {
+            const t = translations[currentLang];
             const totalItems = cart.reduce((acc, curr) => acc + curr.qty, 0);
             const totalPrice = cart.reduce((acc, curr) => acc + (curr.price * curr.qty), 0);
 
             document.getElementById('cart-count-header').innerText = totalItems;
             document.getElementById('floating-cart-badge').innerText = totalItems;
-            document.getElementById('cart-total').innerText = totalPrice + " ден.";
+            document.getElementById('cart-total').innerText = totalPrice + " " + t.currency;
 
             const cartItems = document.getElementById('cart-items');
             cartItems.innerHTML = '';
             
             if (cart.length === 0) {
-                cartItems.innerHTML = '<p class="text-gray-400 text-center py-6">Кошничката е празна</p>';
+                cartItems.innerHTML = `<p class="text-gray-400 text-center py-6">${t.emptyCart}</p>`;
                 return;
             }
 
             cart.forEach(item => {
+                const itemName = item.name[currentLang] || item.name['mk'];
                 cartItems.innerHTML += `
                     <div class="flex justify-between items-center py-2">
                         <div>
-                            <p class="font-semibold text-slate-800">${item.name}</p>
-                            <p class="text-xs text-gray-500">${item.price} ден. x ${item.qty}</p>
+                            <p class="font-semibold text-slate-800">${itemName}</p>
+                            <p class="text-xs text-gray-500">${item.price} ${t.currency} x ${item.qty}</p>
                         </div>
                         <div class="flex items-center gap-2">
                             <button onclick="changeQty(${item.id}, -1)" class="bg-gray-200 px-2.5 py-1 rounded font-bold text-sm">-</button>
@@ -197,13 +342,14 @@
         }
 
         function submitOrder() {
-            if (cart.length === 0) return alert("Кошничката е празна!");
+            const t = translations[currentLang];
+            if (cart.length === 0) return alert(t.emptyCart);
 
             const btn = document.getElementById('send-order-btn');
             btn.disabled = true;
-            btn.innerText = "Се испраќа...";
+            document.getElementById('btn-confirm-text').innerText = t.sending;
 
-            const narackiString = cart.map(i => `${i.name} x${i.qty}`).join(", ");
+            const narackiString = cart.map(i => `${i.name['mk']} x${i.qty}`).join(", ");
             const totalSum = cart.reduce((acc, curr) => acc + (curr.price * curr.qty), 0) + " ден.";
 
             // Popunjavamo skrivenu formi
@@ -216,18 +362,19 @@
         }
 
         function onOrderSuccess() {
-            alert("Нарачката е успешно испратена!");
+            const t = translations[currentLang];
+            alert(t.successMsg);
             cart = [];
             updateCartUI();
             toggleCart();
             const btn = document.getElementById('send-order-btn');
             btn.disabled = false;
-            btn.innerText = "ПОТВРДИ И НАРАЧАЈ";
+            document.getElementById('btn-confirm-text').innerText = t.confirmBtn;
             submitted = false;
         }
 
-        getTableNumber();
-        renderMenu();
+        // Init
+        detectLanguage();
     </script>
 </body>
 </html>
