@@ -6,340 +6,279 @@
     <title>Aroma Bistro & Bar - Meni</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
+    <!-- FontAwesome Ikone -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </head>
-<body class="bg-gray-100 pb-28">
+<body class="bg-gray-100 text-gray-800 font-sans pb-28">
 
-    <!-- Skriveni iframe i forma za slanje u Google Forms bez blokade -->
-    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){onOrderSuccess();}"></iframe>
-    
-    <form id="gform" action="https://docs.google.com/forms/d/e/1FAIpQLSeLlIjcNZ_uoxTLpB6oOiFDEJfF7KOBYVrQF8Iqd80pSo0XRw/formResponse" method="POST" target="hidden_iframe" class="hidden">
-        <input type="text" name="entry.1058901983" id="input_masa">
-        <input type="text" name="entry.1928541526" id="input_naracki">
-        <input type="text" name="entry.270385887" id="input_vkupno">
-    </form>
-
-    <!-- Header -->
-    <header class="bg-slate-900 text-white p-4 sticky top-0 z-40 shadow-lg">
-        <div class="max-w-md mx-auto flex justify-between items-center">
+    <!-- Zaglavlje / Header -->
+    <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-md">
+        <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
             <div>
-                <h1 class="text-xl font-bold tracking-wide text-amber-500">Aroma Bistro & Bar</h1>
-                <p id="table-display" class="text-xs text-gray-300">Маса: 1</p>
+                <h1 class="text-xl font-bold tracking-wide text-amber-400">Aroma Bistro & Bar</h1>
+                <p class="text-xs text-gray-400">Дигитално мени</p>
             </div>
-            
-            <div class="flex items-center gap-2">
-                <!-- Language Selector -->
-                <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-slate-800 text-amber-500 text-xs font-bold py-1.5 px-2 rounded-lg border border-amber-500/30 outline-none">
-                    <option value="mk">🇲🇰 MK</option>
-                    <option value="en">🇬🇧 EN</option>
-                    <option value="sq">🇦🇱 SQ</option>
-                </select>
-
-                <!-- Cart Header Button -->
-                <button onclick="toggleCart()" class="relative bg-amber-500 text-slate-900 font-bold px-3 py-1.5 rounded-lg flex items-center gap-2">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    <span id="cart-count-header" class="bg-slate-900 text-white text-xs px-2 py-0.5 rounded-full">0</span>
-                </button>
+            <!-- Dugmići za jezik -->
+            <div class="flex gap-1 text-xs font-semibold">
+                <button onclick="setLanguage('mk')" id="btn-mk" class="px-2 py-1 rounded bg-amber-500 text-black">MK</button>
+                <button onclick="setLanguage('en')" id="btn-en" class="px-2 py-1 rounded bg-slate-800 text-gray-300">EN</button>
+                <button onclick="setLanguage('sq')" id="btn-sq" class="px-2 py-1 rounded bg-slate-800 text-gray-300">SQ</button>
             </div>
         </div>
     </header>
 
-    <!-- Content -->
-    <main class="max-w-md mx-auto p-4">
-        <!-- Categories -->
-        <div class="flex gap-2 overflow-x-auto pb-4 mb-2 no-scrollbar">
-            <button id="cat-all" onclick="filterCategory('all')" class="bg-amber-500 text-slate-900 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap">Сите</button>
-            <button id="cat-pijaoci" onclick="filterCategory('pijaoci')" class="bg-white text-gray-700 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap border">Пијалоци</button>
-            <button id="cat-hrana" onclick="filterCategory('hrana')" class="bg-white text-gray-700 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap border">Храна</button>
-            <button id="cat-deserti" onclick="filterCategory('deserti')" class="bg-white text-gray-700 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap border">Десерти</button>
+    <!-- Prikaz kategorija i artikala -->
+    <main class="max-w-md mx-auto px-4 pt-4">
+        
+        <!-- Kategorije nav -->
+        <div class="flex gap-2 overflow-x-auto no-scrollbar mb-4 py-1" id="categories-container">
+            <!-- Kategorije se ubacuju dinamički -->
         </div>
 
-        <!-- Menu Items Grid -->
-        <div id="menu-container" class="grid grid-cols-1 gap-4">
-            <!-- Items generated here -->
+        <!-- Lista artikala -->
+        <div id="menu-items" class="flex flex-col gap-3">
+            <!-- Artikli se ubacuju dinamički -->
         </div>
+
     </main>
 
-    <!-- Floating Green Button (Bottom Right) -->
-    <button onclick="toggleCart()" class="fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-5 rounded-full shadow-2xl flex items-center gap-3 z-40 border-2 border-white active:scale-95 transition">
-        <i class="fa-solid fa-cart-shopping text-lg"></i>
-        <span id="floating-btn-text">НАРАЧАЈ</span>
-        <span id="floating-cart-badge" class="bg-white text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
-    </button>
-
-    <!-- Cart Modal -->
-    <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex justify-end flex-col">
-        <div class="bg-white rounded-t-2xl p-4 max-w-md w-full mx-auto max-h-[80vh] flex flex-col shadow-2xl">
-            <div class="flex justify-between items-center border-b pb-3">
-                <h2 id="modal-title" class="text-lg font-bold text-slate-900">Вашата нарачка</h2>
-                <button onclick="toggleCart()" class="text-gray-500 text-xl font-bold">&times;</button>
-            </div>
-            
-            <div id="cart-items" class="overflow-y-auto py-4 flex-1 divide-y">
-                <!-- Cart items list -->
-            </div>
-
-            <div class="border-t pt-3">
-                <div class="flex justify-between font-bold text-lg mb-4 text-slate-900">
-                    <span id="label-total">Вкупно:</span>
-                    <span id="cart-total">0 ден.</span>
+    <!-- Plutajući bar za narudžbinu na dnu -->
+    <div id="cart-bar" class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50 hidden">
+        <div class="max-w-md mx-auto p-4 flex items-center justify-between">
+            <!-- Levo: Brojač narudžbina na makedonskom -->
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <i class="fa-solid fa-utensils text-2xl text-amber-500"></i>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
                 </div>
-                <button id="send-order-btn" onclick="submitOrder()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-paper-plane"></i> <span id="btn-confirm-text">ПОТВРДИ И НАРАЧАЈ</span>
+                <div>
+                    <p class="text-xs text-gray-500" id="txt-naracki-label">Нарачки:</p>
+                    <p class="text-lg font-bold text-gray-900" id="cart-total">0 ден.</p>
+                </div>
+            </div>
+            <!-- Desno: Dugme za potvrdu -->
+            <button onclick="openCartModal()" id="btn-view-order" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-5 py-2.5 rounded-xl text-sm transition">
+                Преглед на нарачка
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal za pregled narudžbine -->
+    <div id="cart-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end justify-center">
+        <div class="bg-white w-full max-w-md rounded-t-2xl p-5 max-h-[85vh] flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h2 class="text-lg font-bold" id="modal-title">Вашата нарачка</h2>
+                    <button onclick="closeCartModal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+                </div>
+                <!-- Lista izabranih artikala -->
+                <div id="cart-list" class="flex flex-col gap-3 max-h-60 overflow-y-auto pr-1">
+                    <!-- Dinamički naručene stavke -->
+                </div>
+            </div>
+
+            <div class="border-t pt-4 mt-4">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="font-bold text-gray-700" id="modal-total-label">Вкупно:</span>
+                    <span class="text-xl font-extrabold text-amber-600" id="modal-total-sum">0 ден.</span>
+                </div>
+                <button onclick="submitOrder()" id="send-order-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition text-center">
+                    <span id="btn-confirm-text">ПОТВРДИ И НАРАЧАЈ</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <script>
-        let submitted = false;
-        let currentLang = 'mk';
+    <!-- Skrivena Google Forma sa iframe-om za slanje bez osvežavanja -->
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){onOrderSuccess();}"></iframe>
+    
+    <form id="gform" action="https://docs.google.com/forms/d/e/1FAIpQLSeLlIjcNZ_uoxTLpB6oOiFDEJfF7KOBYVrQF8Iqd80pSo0XRw/formResponse" method="POST" target="hidden_iframe" class="hidden">
+        <input type="text" name="entry.1058901983" id="input_vreme">
+        <input type="text" name="entry.270385887" id="input_naracki">
+        <input type="text" name="entry.1928541526" id="input_vkupno">
+    </form>
 
-        // Translations Dictionary
+    <script>
+        // Meni Podaci
+        const menuData = [
+            { id: 1, cat: 'pizzas', name: { mk: 'Маргарита', en: 'Margherita', sq: 'Margherita' }, price: 320, img: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=300' },
+            { id: 2, cat: 'pizzas', name: { mk: 'Капричоза', en: 'Capricciosa', sq: 'Capricciosa' }, price: 380, img: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=300' },
+            { id: 3, cat: 'drinks', name: { mk: 'Кока Кола 0.33l', en: 'Coca Cola 0.33l', sq: 'Coca Cola 0.33l' }, price: 110, img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300' },
+            { id: 4, cat: 'drinks', name: { mk: 'Еспресо', en: 'Espresso', sq: 'Espresso' }, price: 80, img: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=300' }
+        ];
+
         const translations = {
             mk: {
-                tablePrefix: "Маса: ",
-                catAll: "Сите",
-                catPijaoci: "Пијалоци",
-                catHrana: "Храна",
-                catDeserti: "Десерти",
-                orderBtn: "НАРАЧАЈ",
-                modalTitle: "Вашата нарачка",
-                total: "Вкупно:",
-                confirmBtn: "ПОТВРДИ И НАРАЧАЈ",
-                sending: "Се испраќа...",
-                emptyCart: "Кошничката е празна",
-                successMsg: "Нарачката е успешно испратена!",
-                currency: "ден."
+                categories: { pizzas: 'Пици', drinks: 'Пијалоци' },
+                narackiLabel: 'Нарачки:',
+                viewOrder: 'Преглед на нарачка',
+                modalTitle: 'Вашата нарачка',
+                totalLabel: 'Вкупно:',
+                btnConfirm: 'ПОТВРДИ И НАРАЧАЈ',
+                sending: 'Се испраќа...',
+                successMsg: 'Вашата нарачка е успешно испратена!',
+                emptyCart: 'Вашата кошничка е празна!'
             },
             en: {
-                tablePrefix: "Table: ",
-                catAll: "All",
-                catPijaoci: "Drinks",
-                catHrana: "Food",
-                catDeserti: "Desserts",
-                orderBtn: "ORDER",
-                modalTitle: "Your Order",
-                total: "Total:",
-                confirmBtn: "CONFIRM & ORDER",
-                sending: "Sending...",
-                emptyCart: "Your cart is empty",
-                successMsg: "Your order was sent successfully!",
-                currency: "den."
+                categories: { pizzas: 'Pizzas', drinks: 'Drinks' },
+                narackiLabel: 'Orders:',
+                viewOrder: 'View Order',
+                modalTitle: 'Your Order',
+                totalLabel: 'Total:',
+                btnConfirm: 'CONFIRM & ORDER',
+                sending: 'Sending...',
+                successMsg: 'Your order has been sent successfully!',
+                emptyCart: 'Your cart is empty!'
             },
             sq: {
-                tablePrefix: "Tryeza: ",
-                catAll: "Të gjitha",
-                catPijaoci: "Pije",
-                catHrana: "Ushqim",
-                catDeserti: "Ëmbëlsira",
-                orderBtn: "POROSIT",
-                modalTitle: "Porosia juaj",
-                total: "Së bashku:",
-                confirmBtn: "KONFIRMO & POROSIT",
-                sending: "Po dërgohet...",
-                emptyCart: "Shporta është bosh",
-                successMsg: "Porosia juaj u dërgua me sukses!",
-                currency: "den."
+                categories: { pizzas: 'Picat', drinks: 'Pijet' },
+                narackiLabel: 'Porositë:',
+                viewOrder: 'Shiko porosinë',
+                modalTitle: 'Porosia juaj',
+                totalLabel: 'Totali:',
+                btnConfirm: 'KONFIRMO & POROSIT',
+                sending: 'Duke dërguar...',
+                successMsg: 'Porosia juaj u dërgua me sukses!',
+                emptyCart: 'Shporta juaj është bosh!'
             }
         };
 
-        // Multilingual Items
-        const menuItems = [
-            { 
-                id: 1, 
-                name: { mk: "Еспресо", en: "Espresso", sq: "Espreso" }, 
-                price: 80, 
-                cat: "pijaoci", 
-                img: "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=150&auto=format&fit=crop&q=60" 
-            },
-            { 
-                id: 2, 
-                name: { mk: "Капучино", en: "Cappuccino", sq: "Kapuçino" }, 
-                price: 100, 
-                cat: "pijaoci", 
-                img: "https://images.unsplash.com/photo-1534778101976-62847782c213?w=150&auto=format&fit=crop&q=60" 
-            },
-            { 
-                id: 3, 
-                name: { mk: "Кока Кола 0.25", en: "Coca Cola 0.25", sq: "Koka Kola 0.25" }, 
-                price: 110, 
-                cat: "pijaoci", 
-                img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=150&auto=format&fit=crop&q=60" 
-            },
-            { 
-                id: 4, 
-                name: { mk: "Цеден Портокал", en: "Fresh Orange Juice", sq: "Lëng Portokalli" }, 
-                price: 140, 
-                cat: "pijaoci", 
-                img: "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=150&auto=format&fit=crop&q=60" 
-            },
-            { 
-                id: 5, 
-                name: { mk: "Пица Капричоза", en: "Pizza Capricciosa", sq: "Pica Kapriçoza" }, 
-                price: 320, 
-                cat: "hrana", 
-                img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=150&auto=format&fit=crop&q=60" 
-            },
-            { 
-                id: 6, 
-                name: { mk: "Арома Бургер", en: "Aroma Burger", sq: "Aroma Burger" }, 
-                price: 280, 
-                cat: "hrana", 
-                img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=150&auto=format&fit=crop&q=60" 
-            },
-            { 
-                id: 7, 
-                name: { mk: "Палачинка со Nutella", en: "Nutella Pancake", sq: "Pallaçinkë me Nutella" }, 
-                price: 160, 
-                cat: "deserti", 
-                img: "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=150&auto=format&fit=crop&q=60" 
-            }
-        ];
-
+        let currentLang = 'mk';
+        let activeCategory = 'pizzas';
         let cart = [];
-        let currentTable = "1";
-        let activeCategory = 'all';
+        let submitted = false;
 
-        // Detect Language Automatically
-        function detectLanguage() {
-            const userLang = (navigator.language || navigator.userLanguage || 'mk').toLowerCase();
-            if (userLang.startsWith('sq')) {
-                currentLang = 'sq';
-            } else if (userLang.startsWith('en')) {
-                currentLang = 'en';
-            } else {
-                currentLang = 'mk';
-            }
-            document.getElementById('lang-select').value = currentLang;
-            applyLanguage();
+        // Automatska detekcija jezika
+        function initLanguage() {
+            const userLang = navigator.language || navigator.userLanguage;
+            if (userLang.startsWith('sq')) currentLang = 'sq';
+            else if (userLang.startsWith('en')) currentLang = 'en';
+            else currentLang = 'mk';
+            setLanguage(currentLang);
         }
 
-        function changeLanguage(lang) {
+        function setLanguage(lang) {
             currentLang = lang;
-            applyLanguage();
-        }
+            ['mk', 'en', 'sq'].forEach(l => {
+                const btn = document.getElementById(`btn-${l}`);
+                if (l === lang) {
+                    btn.className = 'px-2 py-1 rounded bg-amber-500 text-black font-bold';
+                } else {
+                    btn.className = 'px-2 py-1 rounded bg-slate-800 text-gray-300';
+                }
+            });
 
-        function applyLanguage() {
             const t = translations[currentLang];
-            
-            document.getElementById('cat-all').innerText = t.catAll;
-            document.getElementById('cat-pijaoci').innerText = t.catPijaoci;
-            document.getElementById('cat-hrana').innerText = t.catHrana;
-            document.getElementById('cat-deserti').innerText = t.catDeserti;
-
-            document.getElementById('floating-btn-text').innerText = t.orderBtn;
+            document.getElementById('txt-naracki-label').innerText = t.narackiLabel;
+            document.getElementById('btn-view-order').innerText = t.viewOrder;
             document.getElementById('modal-title').innerText = t.modalTitle;
-            document.getElementById('label-total').innerText = t.total;
-            document.getElementById('btn-confirm-text').innerText = t.confirmBtn;
+            document.getElementById('modal-total-label').innerText = t.totalLabel;
+            document.getElementById('btn-confirm-text').innerText = t.btnConfirm;
 
-            getTableNumber();
-            renderMenu(activeCategory);
+            renderCategories();
+            renderMenuItems();
             updateCartUI();
         }
 
-        function getTableNumber() {
-            const params = new URLSearchParams(window.location.search);
-            const sto = params.get('sto') || params.get('table') || params.get('masa');
-            if (sto) currentTable = sto;
-            document.getElementById('table-display').innerText = translations[currentLang].tablePrefix + currentTable;
+        function renderCategories() {
+            const container = document.getElementById('categories-container');
+            const cats = ['pizzas', 'drinks'];
+            const t = translations[currentLang];
+
+            container.innerHTML = cats.map(cat => `
+                <button onclick="switchCategory('${cat}')" class="px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition ${activeCategory === cat ? 'bg-amber-500 text-slate-900 shadow' : 'bg-white text-gray-600 border'}">
+                    ${t.categories[cat]}
+                </button>
+            `).join('');
         }
 
-        function renderMenu(category = 'all') {
-            activeCategory = category;
-            const container = document.getElementById('menu-container');
-            container.innerHTML = '';
+        function switchCategory(cat) {
+            activeCategory = cat;
+            renderCategories();
+            renderMenuItems();
+        }
 
-            const filtered = category === 'all' 
-                ? menuItems 
-                : menuItems.filter(item => item.cat === category);
+        function renderMenuItems() {
+            const container = document.getElementById('menu-items');
+            const items = menuData.filter(i => i.cat === activeCategory);
 
-            filtered.forEach(item => {
-                const itemName = item.name[currentLang] || item.name['mk'];
-                container.innerHTML += `
-                    <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between gap-3">
+            container.innerHTML = items.map(item => {
+                const cartItem = cart.find(c => c.id === item.id);
+                const qty = cartItem ? cartItem.qty : 0;
+
+                return `
+                    <div class="bg-white p-3 rounded-xl shadow-sm flex items-center justify-between border border-gray-100">
                         <div class="flex items-center gap-3">
-                            <img src="${item.img}" alt="${itemName}" class="w-16 h-16 object-cover rounded-lg bg-gray-100 flex-shrink-0">
+                            <img src="${item.img}" class="w-16 h-16 rounded-lg object-cover">
                             <div>
-                                <h3 class="font-bold text-slate-800 text-sm">${itemName}</h3>
-                                <p class="text-amber-600 font-semibold text-xs mt-0.5">${item.price} ${translations[currentLang].currency}</p>
+                                <h3 class="font-bold text-gray-800 text-sm">${item.name[currentLang] || item.name['mk']}</h3>
+                                <p class="text-amber-600 font-extrabold text-sm">${item.price} ден.</p>
                             </div>
                         </div>
-                        <button onclick="addToCart(${item.id})" class="bg-slate-900 hover:bg-slate-800 text-white w-9 h-9 rounded-lg font-bold flex items-center justify-center active:scale-95 transition flex-shrink-0">
-                            +
-                        </button>
+                        <div class="flex items-center gap-2">
+                            ${qty > 0 ? `
+                                <button onclick="changeQty(${item.id}, -1)" class="w-8 h-8 rounded-lg bg-gray-200 text-gray-700 font-bold flex items-center justify-center">-</button>
+                                <span class="font-bold text-sm w-4 text-center">${qty}</span>
+                            ` : ''}
+                            <button onclick="changeQty(${item.id}, 1)" class="w-8 h-8 rounded-lg bg-amber-500 text-slate-900 font-bold flex items-center justify-center">+</button>
+                        </div>
                     </div>
                 `;
-            });
+            }).join('');
         }
 
-        function filterCategory(cat) {
-            renderMenu(cat);
-        }
+        function changeQty(id, change) {
+            const item = menuData.find(i => i.id === id);
+            let cartItem = cart.find(c => c.id === id);
 
-        function addToCart(id) {
-            const item = menuItems.find(i => i.id === id);
-            const inCart = cart.find(i => i.id === id);
-
-            if (inCart) {
-                inCart.qty++;
-            } else {
+            if (cartItem) {
+                cartItem.qty += change;
+                if (cartItem.qty <= 0) {
+                    cart = cart.filter(c => c.id !== id);
+                }
+            } else if (change > 0) {
                 cart.push({ ...item, qty: 1 });
             }
+
+            renderMenuItems();
             updateCartUI();
         }
 
         function updateCartUI() {
-            const t = translations[currentLang];
-            const totalItems = cart.reduce((acc, curr) => acc + curr.qty, 0);
-            const totalPrice = cart.reduce((acc, curr) => acc + (curr.price * curr.qty), 0);
+            const totalQty = cart.reduce((acc, curr) => acc + curr.qty, 0);
+            const totalSum = cart.reduce((acc, curr) => acc + (curr.price * curr.qty), 0);
 
-            document.getElementById('cart-count-header').innerText = totalItems;
-            document.getElementById('floating-cart-badge').innerText = totalItems;
-            document.getElementById('cart-total').innerText = totalPrice + " " + t.currency;
-
-            const cartItems = document.getElementById('cart-items');
-            cartItems.innerHTML = '';
-            
-            if (cart.length === 0) {
-                cartItems.innerHTML = `<p class="text-gray-400 text-center py-6">${t.emptyCart}</p>`;
-                return;
+            const cartBar = document.getElementById('cart-bar');
+            if (totalQty > 0) {
+                cartBar.classList.remove('hidden');
+            } else {
+                cartBar.classList.add('hidden');
+                closeCartModal();
             }
 
-            cart.forEach(item => {
-                const itemName = item.name[currentLang] || item.name['mk'];
-                cartItems.innerHTML += `
-                    <div class="flex justify-between items-center py-2">
-                        <div>
-                            <p class="font-semibold text-slate-800">${itemName}</p>
-                            <p class="text-xs text-gray-500">${item.price} ${t.currency} x ${item.qty}</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="changeQty(${item.id}, -1)" class="bg-gray-200 px-2.5 py-1 rounded font-bold text-sm">-</button>
-                            <span class="font-semibold text-sm px-1">${item.qty}</span>
-                            <button onclick="changeQty(${item.id}, 1)" class="bg-gray-200 px-2.5 py-1 rounded font-bold text-sm">+</button>
-                        </div>
+            document.getElementById('cart-count').innerText = totalQty;
+            document.getElementById('cart-total').innerText = `${totalSum} ден.`;
+            document.getElementById('modal-total-sum').innerText = `${totalSum} ден.`;
+
+            // Modal lista
+            const modalList = document.getElementById('cart-list');
+            modalList.innerHTML = cart.map(i => `
+                <div class="flex justify-between items-center text-sm border-b pb-2">
+                    <div>
+                        <p class="font-bold text-gray-800">${i.name[currentLang] || i.name['mk']}</p>
+                        <p class="text-xs text-gray-500">${i.price} ден. x ${i.qty}</p>
                     </div>
-                `;
-            });
+                    <span class="font-bold text-amber-600">${i.price * i.qty} ден.</span>
+                </div>
+            `).join('');
         }
 
-        function changeQty(id, delta) {
-            const item = cart.find(i => i.id === id);
-            if (item) {
-                item.qty += delta;
-                if (item.qty <= 0) {
-                    cart = cart.filter(i => i.id !== id);
-                }
-            }
-            updateCartUI();
-        }
-
-        function toggleCart() {
-            const modal = document.getElementById('cart-modal');
-            modal.classList.toggle('hidden');
-        }
+        function openCartModal() { document.getElementById('cart-modal').classList.remove('hidden'); }
+        function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
 
         function submitOrder() {
             const t = translations[currentLang];
@@ -349,11 +288,15 @@
             btn.disabled = true;
             document.getElementById('btn-confirm-text').innerText = t.sending;
 
+            // Vreme HH:MM
+            const now = new Date();
+            const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+
             const narackiString = cart.map(i => `${i.name['mk']} x${i.qty}`).join(", ");
             const totalSum = cart.reduce((acc, curr) => acc + (curr.price * curr.qty), 0) + " ден.";
 
-            // Popunjavamo skrivenu formi
-            document.getElementById('input_masa').value = currentTable;
+            // Popunjavanje skrivenih inputa
+            document.getElementById('input_vreme').value = currentTime;
             document.getElementById('input_naracki').value = narackiString;
             document.getElementById('input_vkupno').value = totalSum;
 
@@ -365,16 +308,15 @@
             const t = translations[currentLang];
             alert(t.successMsg);
             cart = [];
-            updateCartUI();
-            toggleCart();
-            const btn = document.getElementById('send-order-btn');
-            btn.disabled = false;
-            document.getElementById('btn-confirm-text').innerText = t.confirmBtn;
             submitted = false;
+            document.getElementById('send-order-btn').disabled = false;
+            document.getElementById('btn-confirm-text').innerText = t.btnConfirm;
+            closeCartModal();
+            renderMenuItems();
+            updateCartUI();
         }
 
-        // Init
-        detectLanguage();
+        window.onload = initLanguage;
     </script>
 </body>
 </html>
