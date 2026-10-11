@@ -174,13 +174,13 @@
         let activeCategory = 'pizzas';
         let cart = [];
         let submitted = false;
-        let currentTable = 'Sto 1';
+        let currentTable = ''; // Prazno dok se ne skenira QR kod sa parametrom (?sto=X)
 
         function initLanguage() {
             const urlParams = new URLSearchParams(window.location.search);
             const tableParam = urlParams.get('sto') || urlParams.get('table') || urlParams.get('masa');
             if (tableParam) {
-                currentTable = 'Sto ' + tableParam;
+                currentTable = 'Masa ' + tableParam;
             }
 
             const userLang = navigator.language || navigator.userLanguage;
@@ -202,7 +202,8 @@
             });
 
             const t = translations[currentLang];
-            document.getElementById('header-subtitle').innerText = t.subtitle + ' (' + currentTable + ')';
+            // Prikaz naziva u zaglavlju (samo ako postoji sto)
+            document.getElementById('header-subtitle').innerText = currentTable ? (t.subtitle + ' (' + currentTable + ')') : t.subtitle;
             document.getElementById('txt-naracki-label').innerText = t.narackiLabel;
             document.getElementById('btn-view-order').innerText = t.viewOrder;
             document.getElementById('modal-title').innerText = t.modalTitle;
@@ -324,7 +325,7 @@
             const totalSum = cart.reduce((acc, curr) => acc + (curr.price * curr.qty), 0) + " ден.";
 
             document.getElementById('input_vreme').value = currentTime;
-            document.getElementById('input_masa').value = currentTable;
+            document.getElementById('input_masa').value = currentTable; // Biće prazno ako se ne skenira preko QR koda
             document.getElementById('input_naracki').value = narackiString;
             document.getElementById('input_vkupno').value = totalSum;
 
