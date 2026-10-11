@@ -9,7 +9,16 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-100 pb-24">
+<body class="bg-gray-100 pb-28">
+
+    <!-- Skriveni iframe i forma za slanje u Google Forms bez blokade -->
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){onOrderSuccess();}"></iframe>
+    
+    <form id="gform" action="https://docs.google.com/forms/d/e/1FAIpQLSeLlIjcNZ_uoxTLpB6oOiFDEJfF7KOBYVrQF8Iqd80pSo0XRw/formResponse" method="POST" target="hidden_iframe" class="hidden">
+        <input type="text" name="entry.1058901983" id="input_masa">
+        <input type="text" name="entry.1928541526" id="input_naracki">
+        <input type="text" name="entry.270385887" id="input_vkupno">
+    </form>
 
     <!-- Header -->
     <header class="bg-slate-900 text-white p-4 sticky top-0 z-40 shadow-lg">
@@ -20,7 +29,7 @@
             </div>
             <button onclick="toggleCart()" class="relative bg-amber-500 text-slate-900 font-bold px-3 py-2 rounded-lg flex items-center gap-2">
                 <i class="fa-solid fa-cart-shopping"></i>
-                <span id="cart-count" class="bg-slate-900 text-white text-xs px-2 py-0.5 rounded-full">0</span>
+                <span id="cart-count-header" class="bg-slate-900 text-white text-xs px-2 py-0.5 rounded-full">0</span>
             </button>
         </div>
     </header>
@@ -40,6 +49,13 @@
             <!-- Items generated here -->
         </div>
     </main>
+
+    <!-- Floating Green "НАРАЧАЈ" Button (Bottom Right) -->
+    <button onclick="toggleCart()" class="fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-5 rounded-full shadow-2xl flex items-center gap-3 z-40 border-2 border-white active:scale-95 transition">
+        <i class="fa-solid fa-cart-shopping text-lg"></i>
+        <span>НАРАЧАЈ</span>
+        <span id="floating-cart-badge" class="bg-white text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+    </button>
 
     <!-- Cart Modal -->
     <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex justify-end flex-col">
@@ -66,20 +82,17 @@
     </div>
 
     <script>
-        // Target Google Form
-        const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeLlIjcNZ_uoxTLpB6oOiFDEJfF7KOBYVrQF8Iqd80pSo0XRw/formResponse";
-        const ENTRY_MASA = "entry.1058901983";
-        const ENTRY_NARACKI = "entry.1928541526";
-        const ENTRY_VKUPNO = "entry.270385887";
+        let submitted = false;
 
+        // Lista artikala sa opcijom za sliku (img)
         const menuItems = [
-            { id: 1, name: "Еспресо", price: 80, cat: "pijaoci" },
-            { id: 2, name: "Капучино", price: 100, cat: "pijaoci" },
-            { id: 3, name: "Кока Кола 0.25", price: 110, cat: "pijaoci" },
-            { id: 4, name: "Цеден Портокал", price: 140, cat: "pijaoci" },
-            { id: 5, name: "Пица Капричоза", price: 320, cat: "hrana" },
-            { id: 6, name: "Аロマ Бургер", price: 280, cat: "hrana" },
-            { id: 7, name: "Палачинка со Nutella", price: 160, cat: "deserti" }
+            { id: 1, name: "Еспресо", price: 80, cat: "pijaoci", img: "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=150&auto=format&fit=crop&q=60" },
+            { id: 2, name: "Капучино", price: 100, cat: "pijaoci", img: "https://images.unsplash.com/photo-1534778101976-62847782c213?w=150&auto=format&fit=crop&q=60" },
+            { id: 3, name: "Кока Кола 0.25", price: 110, cat: "pijaoci", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=150&auto=format&fit=crop&q=60" },
+            { id: 4, name: "Цеден Портокал", price: 140, cat: "pijaoci", img: "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=150&auto=format&fit=crop&q=60" },
+            { id: 5, name: "Пица Капричоза", price: 320, cat: "hrana", img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=150&auto=format&fit=crop&q=60" },
+            { id: 6, name: "Арома Бургер", price: 280, cat: "hrana", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=150&auto=format&fit=crop&q=60" },
+            { id: 7, name: "Палачинка со Nutella", price: 160, cat: "deserti", img: "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=150&auto=format&fit=crop&q=60" }
         ];
 
         let cart = [];
@@ -102,12 +115,15 @@
 
             filtered.forEach(item => {
                 container.innerHTML += `
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
-                        <div>
-                            <h3 class="font-bold text-slate-800">${item.name}</h3>
-                            <p class="text-amber-600 font-semibold text-sm">${item.price} ден.</p>
+                    <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <img src="${item.img}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg bg-gray-100 flex-shrink-0">
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-sm">${item.name}</h3>
+                                <p class="text-amber-600 font-semibold text-xs mt-0.5">${item.price} ден.</p>
+                            </div>
                         </div>
-                        <button onclick="addToCart(${item.id})" class="bg-slate-900 text-white w-9 h-9 rounded-lg font-bold flex items-center justify-center active:scale-95 transition">
+                        <button onclick="addToCart(${item.id})" class="bg-slate-900 hover:bg-slate-800 text-white w-9 h-9 rounded-lg font-bold flex items-center justify-center active:scale-95 transition flex-shrink-0">
                             +
                         </button>
                     </div>
@@ -132,17 +148,16 @@
         }
 
         function updateCartUI() {
-            const cartCount = document.getElementById('cart-count');
-            const cartItems = document.getElementById('cart-items');
-            const cartTotal = document.getElementById('cart-total');
-
             const totalItems = cart.reduce((acc, curr) => acc + curr.qty, 0);
             const totalPrice = cart.reduce((acc, curr) => acc + (curr.price * curr.qty), 0);
 
-            cartCount.innerText = totalItems;
-            cartTotal.innerText = totalPrice + " ден.";
+            document.getElementById('cart-count-header').innerText = totalItems;
+            document.getElementById('floating-cart-badge').innerText = totalItems;
+            document.getElementById('cart-total').innerText = totalPrice + " ден.";
 
+            const cartItems = document.getElementById('cart-items');
             cartItems.innerHTML = '';
+            
             if (cart.length === 0) {
                 cartItems.innerHTML = '<p class="text-gray-400 text-center py-6">Кошничката е празна</p>';
                 return;
@@ -191,32 +206,24 @@
             const narackiString = cart.map(i => `${i.name} x${i.qty}`).join(", ");
             const totalSum = cart.reduce((acc, curr) => acc + (curr.price * curr.qty), 0) + " ден.";
 
-            // Format body as x-www-form-urlencoded for Google Forms compatibility
-            const bodyData = new URLSearchParams();
-            bodyData.append(ENTRY_MASA, currentTable);
-            bodyData.append(ENTRY_NARACKI, narackiString);
-            bodyData.append(ENTRY_VKUPNO, totalSum);
+            // Popunjavamo skrivenu formi
+            document.getElementById('input_masa').value = currentTable;
+            document.getElementById('input_naracki').value = narackiString;
+            document.getElementById('input_vkupno').value = totalSum;
 
-            fetch(GOOGLE_FORM_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: bodyData.toString()
-            }).then(() => {
-                alert("Нарачката е успешно испратена!");
-                cart = [];
-                updateCartUI();
-                toggleCart();
-                btn.disabled = false;
-                btn.innerText = "ПОТВРДИ И НАРАЧАЈ";
-            }).catch(error => {
-                alert("Грешка при испраќање.");
-                console.error(error);
-                btn.disabled = false;
-                btn.innerText = "ПОТВРДИ И НАРАЧАЈ";
-            });
+            submitted = true;
+            document.getElementById('gform').submit();
+        }
+
+        function onOrderSuccess() {
+            alert("Нарачката е успешно испратена!");
+            cart = [];
+            updateCartUI();
+            toggleCart();
+            const btn = document.getElementById('send-order-btn');
+            btn.disabled = false;
+            btn.innerText = "ПОТВРДИ И НАРАЧАЈ";
+            submitted = false;
         }
 
         getTableNumber();
